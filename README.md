@@ -70,12 +70,15 @@ landscape; treat its result as a demonstration on synthetic data, not a general 
 
 ## Install
 
+Pre-alpha is installed from the tagged GitHub release (PyPI publishing is planned for v0.1.1):
+
 ```bash
-pip install oraclematch                 # core (numpy only) — runs the synthetic demo & all tests
-pip install "oraclematch[vina]"         # + classical docking oracle (CPU)
-pip install "oraclematch[boltz]"        # + DL co-folding oracle (GPU; weights downloaded separately)
-pip install "oraclematch[chem,physics]" # + RDKit mutation + PoseBusters validity gate
+pip install "git+https://github.com/hinanohart/oraclematch@v0.1.0a1"          # core (numpy only)
+pip install "oraclematch[vina] @ git+https://github.com/hinanohart/oraclematch@v0.1.0a1"   # + Vina (CPU)
+pip install "oraclematch[boltz] @ git+https://github.com/hinanohart/oraclematch@v0.1.0a1"  # + Boltz-2 (GPU)
 ```
+
+The core install is numpy-only and runs the synthetic demo and the full test suite with no GPU.
 
 ## Quickstart (GPU-free, deterministic)
 
