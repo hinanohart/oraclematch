@@ -4,13 +4,13 @@
   "trigger": "OSS開始",
   "created_at": "2026-05-27",
   "updated_at": "2026-05-27",
-  "current_phase": "S7",
-  "current_step": "3-agent critic gate (build complete, awaiting verification)",
+  "current_phase": "S8",
+  "current_step": "release: tag v0.1.0a1 + GitHub release + branch protection",
   "status": "in_progress",
   "build_env": "CPU-only (no GPU): KC-2 GPU pilot physically cannot run here; deferred honestly to v0.1.1",
   "s_minus_1_gate": {
     "KC-1_no_identical_repo": {"status": "PROCEED", "evidence": "document-specialist agent ac3ab4b8: no OSS combines cross-paradigm oracle disagreement penalty + MAP-Elites; sources GitHub/arXiv/web"},
-    "KC-2_inter_model_rho": {"status": "DEFERRED_NO_GPU", "evidence": "no GPU in build env; scripts/gpu_pilot_kc2.py provided; documented prerequisite for empirical novelty claim; synthetic landscape demonstrates the dependency (caught-rate 0.975->0.40 as rho 0.39->0.83)", "value": null},
+    "KC-2_inter_model_rho": {"status": "DEFERRED_NO_GPU", "evidence": "no GPU in build env; scripts/gpu_pilot_kc2.py provided; documented prerequisite for empirical novelty claim; synthetic landscape demonstrates the dependency (caught-rate 0.975->0.40 as emitted inter_oracle_spearman_rho 0.60->0.91)", "value": null},
     "KC-3_anti_gaming": {"status": "PROCEED", "evidence": "control_b synthetic dry-run: caught_rate 0.975 (CI lower 0.87 >= 0.5) at shared=0.5"},
     "KC-4_cost": {"status": "PROCEED_ESTIMATE", "evidence": "mock CI runs instantly; real GPU cost (Boltz-2 ~20s/ligand) deferred with live inference to v0.1.1"},
     "KC-5_license": {"status": "PROCEED", "evidence": "core numpy-only (BSD); Boltz-2 MIT, Vina Apache-2.0, RDKit/PoseBusters BSD-3, openevolve MIT; GNINA (GPL) deliberately excluded from core"},
@@ -24,14 +24,14 @@
     "S4_anti_gaming": {"status": "done", "artifacts": ["audit/antigaming.py (caught_rate/FPR + Wilson CI)"]},
     "S5_mvp_experiments": {"status": "done", "artifacts": ["experiments/controls.py (Control A paired, Control B)", "experiments/run_mvp.py"]},
     "S6_docs_ci": {"status": "done", "artifacts": ["README.md (measured synthetic numbers + prior-art table)", "NOTICE", "CHANGELOG.md", ".github/workflows/ci.yml", ".github/workflows/release.yml", "scripts/gpu_pilot_kc2.py"]},
-    "S7_critic_gate": {"status": "in_progress", "artifacts": []},
-    "S8_release": {"status": "pending", "artifacts": []}
+    "S7_critic_gate": {"status": "done", "artifacts": ["Monitor-1 PASS (architecture fidelity+honesty)", "Monitor-2 PASS (completeness+tests+GitHub state)", "Meta-Monitor GO (audited both monitors; caught stale-rho between-lane gap, fixed)"]},
+    "S8_release": {"status": "in_progress", "artifacts": []}
   },
   "last_verified_test": "pytest -q (60 passed); ruff check (clean); mypy (clean); coverage 93%; uv build (wheel+sdist OK)",
   "next_action": "create GitHub repo hinanohart/oraclematch, push main, run 3-agent critic gate (2 monitors + 1 meta-monitor), then S8 release v0.1.0a1 + branch protection",
   "blocking_issues": [],
   "default_branch": "main",
-  "critic_gate": {"agent_a": null, "agent_b": null, "agent_c": null, "overall": null},
+  "critic_gate": {"agent_a": "PASS", "agent_b": "PASS", "agent_c": "GO", "overall": "GO"},
   "release": {"tag": null, "pypi_version": null, "github_release_url": null},
   "abort_log": []
 }
