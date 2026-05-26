@@ -4,9 +4,9 @@
   "trigger": "OSS開始",
   "created_at": "2026-05-27",
   "updated_at": "2026-05-27",
-  "current_phase": "S8",
-  "current_step": "release: tag v0.1.0a1 + GitHub release + branch protection",
-  "status": "in_progress",
+  "current_phase": "complete",
+  "current_step": "released v0.1.0a1; pre-alpha framework complete",
+  "status": "done",
   "build_env": "CPU-only (no GPU): KC-2 GPU pilot physically cannot run here; deferred honestly to v0.1.1",
   "s_minus_1_gate": {
     "KC-1_no_identical_repo": {"status": "PROCEED", "evidence": "document-specialist agent ac3ab4b8: no OSS combines cross-paradigm oracle disagreement penalty + MAP-Elites; sources GitHub/arXiv/web"},
@@ -25,13 +25,13 @@
     "S5_mvp_experiments": {"status": "done", "artifacts": ["experiments/controls.py (Control A paired, Control B)", "experiments/run_mvp.py"]},
     "S6_docs_ci": {"status": "done", "artifacts": ["README.md (measured synthetic numbers + prior-art table)", "NOTICE", "CHANGELOG.md", ".github/workflows/ci.yml", ".github/workflows/release.yml", "scripts/gpu_pilot_kc2.py"]},
     "S7_critic_gate": {"status": "done", "artifacts": ["Monitor-1 PASS (architecture fidelity+honesty)", "Monitor-2 PASS (completeness+tests+GitHub state)", "Meta-Monitor GO (audited both monitors; caught stale-rho between-lane gap, fixed)"]},
-    "S8_release": {"status": "in_progress", "artifacts": []}
+    "S8_release": {"status": "done", "artifacts": ["tag v0.1.0a1", "GitHub prerelease + wheel/sdist assets", "branch protection (required CI matrix, strict)", "release.yml run success (PyPI skipped: no token)"]}
   },
   "last_verified_test": "pytest -q (60 passed); ruff check (clean); mypy (clean); coverage 93%; uv build (wheel+sdist OK)",
-  "next_action": "create GitHub repo hinanohart/oraclematch, push main, run 3-agent critic gate (2 monitors + 1 meta-monitor), then S8 release v0.1.0a1 + branch protection",
+  "next_action": "v0.1.1 (when GPU available): run scripts/gpu_pilot_kc2.py to validate KC-2 (real Boltz-2 x Vina Spearman rho), then wire live inference; v0.2 = VeriEvolve-Bio (scorewright reuse, K>=3 oracles, peptides)",
   "blocking_issues": [],
   "default_branch": "main",
   "critic_gate": {"agent_a": "PASS", "agent_b": "PASS", "agent_c": "GO", "overall": "GO"},
-  "release": {"tag": null, "pypi_version": null, "github_release_url": null},
+  "release": {"tag": "v0.1.0a1", "pypi_version": null, "github_release_url": "https://github.com/hinanohart/oraclematch/releases/tag/v0.1.0a1"},
   "abort_log": []
 }
