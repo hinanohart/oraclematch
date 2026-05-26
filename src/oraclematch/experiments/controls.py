@@ -29,6 +29,7 @@ from oraclematch.backends.mock import (
     sample_random_molecule,
 )
 from oraclematch.calibration.ensemble import EnsembleCalibrator, ScoredResult
+from oraclematch.core.normalize import rank_normalize
 from oraclematch.core.protocol import Molecule
 from oraclematch.evolution.mapelites import MapElites
 from oraclematch.evolution.mutate import random_genome
@@ -201,6 +202,14 @@ def control_b(
     test_scored = sc_clean_test + sc_hackers
     is_hacker = [False] * n_clean_test + [True] * n_hackers
 
+    # Intrinsic inter-oracle Spearman rho, measured over a NEUTRAL random ligand population (not the
+    # adversarial audit set, which is anti-correlated by construction). This is the KC-2 analog: the
+    # quantity the real GPU pilot would measure to decide whether the disagreement penalty is viable.
+    neutral = [sample_random_molecule(rng) for _ in range(256)]
+    a_dl = rank_normalize(np.array([r.affinity for r in dl.predict_batch(neutral)]))
+    a_dock = rank_normalize(np.array([r.affinity for r in dock.predict_batch(neutral)]))
+    rho = float(np.corrcoef(a_dl, a_dock)[0, 1])
+
     detector = AntiGamingDetector()
     detector.calibrate(sc_calib, target_fpr=target_fpr)  # operating point from clean molecules only
     report: AntiGamingReport = detector.audit(test_scored, is_hacker)
@@ -215,6 +224,7 @@ def control_b(
             "n_clean_test": n_clean_test,
             "n_hackers": n_hackers,
         },
+        "inter_oracle_spearman_rho": round(rho, 3),
         "threshold": round(report.threshold, 4),
         "caught_rate": round(report.caught_rate, 4),
         "caught_rate_ci95": [round(c, 4) for c in report.caught_rate_ci],

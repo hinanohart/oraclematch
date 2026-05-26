@@ -120,14 +120,15 @@ this landscape. The penalty's distinctive value shows up in robustness (Control 
 
 **Control B — anti-gaming** (catch injected single-oracle exploiters; Wilson CIs):
 
-| oracle correlation | caught-rate | FPR |
+| oracle correlation (emitted as `inter_oracle_spearman_rho`) | caught-rate | FPR |
 |---|---|---|
-| low (`shared=0.5`, ρ≈0.39) | **0.975** [0.87, 0.996] | 0.150 [0.07, 0.29] |
-| high (`shared=0.9`, ρ≈0.83) | 0.400 [0.26, 0.55] | 0.050 [0.01, 0.17] |
+| moderate (`shared=0.5`, ρ≈0.60) | **0.975** [0.87, 0.996] | 0.150 [0.07, 0.29] |
+| high (`shared=0.9`, ρ≈0.91) | 0.400 [0.26, 0.55] | 0.050 [0.01, 0.17] |
 
-As the two oracles become more correlated, the disagreement signal weakens and the caught-rate
-collapses — an empirical demonstration of **why KC-2 (the real-oracle correlation pilot) gates the
-whole method**.
+ρ is the intrinsic inter-oracle Spearman correlation over a neutral random ligand population — the
+KC-2 analog the real GPU pilot would measure. As the two oracles become more correlated, the
+disagreement signal weakens and the caught-rate collapses — an empirical demonstration of **why KC-2
+(the real-oracle correlation pilot) gates the whole method**.
 
 ## Backends
 
