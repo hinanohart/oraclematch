@@ -2,8 +2,8 @@
 
 The default operators act on the abstract integer ``genome`` so search is deterministic and
 chemistry-free in CI. A chemically-valid SMILES mutation path (RDKit) and a program-level operator
-(openevolve) are intended optional extras; they are out of scope for the GPU-free v0.1.0a1 core and
-plug in behind the same ``mutate_fn`` signature.
+are out of scope for the GPU-free v0.1.0a1 core; both are roadmap items for v0.2 and would plug in
+behind the same genome-in/genome-out operator signature used here.
 """
 
 from __future__ import annotations
@@ -11,7 +11,6 @@ from __future__ import annotations
 import numpy as np
 
 from oraclematch.backends.mock import GENE_MAX, GENOME_DIM
-from oraclematch.core.protocol import Molecule
 
 
 def random_genome(
@@ -55,7 +54,3 @@ def crossover(
     n = min(len(g1), len(g2))
     pick = rng.random(n) < 0.5
     return tuple(int(g1[i] if pick[i] else g2[i]) for i in range(n))
-
-
-def mutate_molecule(mol: Molecule, rng: np.random.Generator, rate: float = 0.3) -> Molecule:
-    return Molecule(smiles=mol.smiles, genome=mutate_genome(mol.genome, rng, rate))

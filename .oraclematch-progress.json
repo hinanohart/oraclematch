@@ -33,5 +33,6 @@
   "default_branch": "main",
   "critic_gate": {"agent_a": "PASS", "agent_b": "PASS", "agent_c": "GO", "overall": "GO"},
   "release": {"tag": "v0.1.0a1", "pypi_version": null, "github_release_url": "https://github.com/hinanohart/oraclematch/releases/tag/v0.1.0a1"},
+  "post_release_audit": {"date": "2026-05-27", "scope": "premise-doubting full audit (code refinement + architecture fidelity + honesty + GitHub state) after /compact", "result": "no FATAL/MAJOR; architect=SHIP-CLEAN, critic=GO; sigma_a-after-rank-normalize novelty core verified correct; zero scope-cut/compaction-gap; GitHub state clean (CI all green, PRs 0, branch protection active, no dependabot alerts)", "minor_fixes_applied_on_main": ["removed unused openevolve 'evolve' extra", "removed dead mutate_molecule", "deduped argsort in rank_normalize (no behaviour change; README numbers reproduce byte-for-byte)"]},
   "abort_log": []
 }

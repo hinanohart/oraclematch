@@ -43,8 +43,6 @@ vina = ["vina>=1.2", "meeko>=0.5"]
 boltz = ["boltz>=2.0"]
 # Physical-validity gate used as the confidence term. BSD-3-Clause.
 physics = ["posebusters>=0.3"]
-# LLM/program-level mutation operator. MIT. Pin a commit in advanced docs.
-evolve = ["openevolve"]
 dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.4", "mypy>=1.8"]
 
 [project.scripts]

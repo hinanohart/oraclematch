@@ -3,6 +3,19 @@
 All notable changes to this project are documented here. This project adheres to
 [Semantic Versioning](https://semver.org/) (pre-releases use the PEP 440 `aN` suffix).
 
+## [Unreleased]
+
+Post-release code-quality pass. No behaviour change: the synthetic Control A / Control B
+outputs reproduce byte-for-byte, all 60 tests pass, coverage 93%.
+
+### Changed
+- Removed the unused `evolve` optional-dependency extra (`openevolve`): it advertised a
+  program-level mutation operator that the v0.1.0a1 core does not wire in. The genome-level
+  operators remain the only mutation path; a real chemical/program operator is a v0.2 roadmap item.
+- Removed the dead, unreferenced `mutate_molecule` helper from `evolution/mutate.py`.
+- Eliminated a redundant `argsort` in `core.normalize.rank_normalize` (the per-oracle
+  normalization on the σ_a critical path) by threading the existing sort order into `_average_ties`.
+
 ## [0.1.0a1] — 2026-05-27
 
 First public pre-alpha. Ships the **framework** and a **deterministic, GPU-free synthetic

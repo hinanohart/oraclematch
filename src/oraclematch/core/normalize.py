@@ -32,12 +32,11 @@ def rank_normalize(values: np.ndarray) -> np.ndarray:
     ranks = np.empty(n, dtype=float)
     ranks[order] = np.arange(n, dtype=float)
     # average ranks for ties so equal scores get equal normalized values
-    _average_ties(arr, ranks)
+    _average_ties(arr, ranks, order)
     return ranks / (n - 1)
 
 
-def _average_ties(arr: np.ndarray, ranks: np.ndarray) -> None:
-    order = np.argsort(arr, kind="mergesort")
+def _average_ties(arr: np.ndarray, ranks: np.ndarray, order: np.ndarray) -> None:
     sorted_vals = arr[order]
     i = 0
     n = arr.size
