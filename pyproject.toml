@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "oraclematch"
+version = "0.1.0a1"
+description = "Cross-paradigm oracle-disagreement as a calibrated fitness penalty for MAP-Elites molecular search (pre-alpha framework; synthetic/mock only)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "hinanohart" }]
+keywords = [
+    "molecular-design", "quality-diversity", "map-elites",
+    "uncertainty", "reward-hacking", "docking", "co-folding",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+# Core stays numpy-only so the whole novelty machinery (rank-normalize, sigma_a
+# disagreement penalty, bootstrap CI, anti-gaming) is testable with NO GPU and NO
+# heavy/chemistry deps. Everything that needs a GPU or external engine is an extra.
+dependencies = ["numpy>=1.24"]
+
+[project.urls]
+Homepage = "https://github.com/hinanohart/oraclematch"
+Repository = "https://github.com/hinanohart/oraclematch"
+Changelog = "https://github.com/hinanohart/oraclematch/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+# Chemically-valid SMILES mutation (real evolution path; mock path needs none).
+chem = ["rdkit>=2023.9"]
+# Classical-physics docking oracle (CPU). Apache-2.0.
+vina = ["vina>=1.2", "meeko>=0.5"]
+# Deep-learning co-folding oracle (GPU). MIT. Never exercised in CI.
+boltz = ["boltz>=2.0"]
+# Physical-validity gate used as the confidence term. BSD-3-Clause.
+physics = ["posebusters>=0.3"]
+# LLM/program-level mutation operator. MIT. Pin a commit in advanced docs.
+evolve = ["openevolve"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.4", "mypy>=1.8"]
+
+[project.scripts]
+oraclematch = "oraclematch.experiments.run_mvp:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/oraclematch"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+# E501: line length handled by formatter; B905: we intentionally use unequal-length zips
+# (e.g. crossover via min()), so strict=True would be incorrect.
+ignore = ["E501", "B905"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = false
+files = ["src/oraclematch"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

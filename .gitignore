@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+*.so
+# experiment scratch (R8: failures are quarantined here, never rm -rf'd)
+experiments/_wip/*
+!experiments/_wip/.gitkeep
+# never commit model weights / large artifacts
+*.ckpt
+*.pt
+*.safetensors
