@@ -8,7 +8,7 @@ version = "0.1.0a1"
 description = "Cross-paradigm oracle-disagreement as a calibrated fitness penalty for MAP-Elites molecular search (pre-alpha framework; synthetic/mock only)."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 authors = [{ name = "hinanohart" }]
 keywords = [
     "molecular-design", "quality-diversity", "map-elites",
@@ -17,7 +17,7 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -37,7 +37,7 @@ Changelog = "https://github.com/hinanohart/oraclematch/blob/main/CHANGELOG.md"
 [project.optional-dependencies]
 # Chemically-valid SMILES mutation (real evolution path; mock path needs none).
 chem = ["rdkit>=2023.9"]
-# Classical-physics docking oracle (CPU). Apache-2.0.
+# Classical-physics docking oracle (CPU). MIT.
 vina = ["vina>=1.2", "meeko>=0.5"]
 # Deep-learning co-folding oracle (GPU). MIT. Never exercised in CI.
 boltz = ["boltz>=2.0"]
