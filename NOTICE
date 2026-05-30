@@ -1,0 +1,25 @@
+oraclematch
+Copyright 2026 hinanohart
+
+This product includes software developed at hinanohart.
+Licensed under the MIT License.
+------------------------------------------------------------------------
+Third-party components (optional dependencies / referenced oracles)
+------------------------------------------------------------------------
+This package's core depends only on NumPy (BSD-3-Clause). The following
+are OPTIONAL extras or oracles the framework can drive; each is the
+property of its authors under its own license, and is NOT bundled here:
+
+  * Boltz-2            — MIT License           (DL co-folding oracle, GPU)
+  * AutoDock-Vina      — Apache-2.0            (classical docking oracle, CPU)
+  * RDKit              — BSD-3-Clause          (chemically-valid mutation)
+  * PoseBusters        — BSD-3-Clause          (physical-validity gate)
+  * openevolve         — MIT License           (program-level mutation; pin a commit)
+
+------------------------------------------------------------------------
+Attribution
+------------------------------------------------------------------------
+The anti-gaming caught-rate / false-positive-rate audit methodology is
+inspired by the author's `scorewright` project (MIT). It is
+reimplemented natively in this package to avoid cross-repository coupling;
+no scorewright code is included.
