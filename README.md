@@ -9,16 +9,33 @@
 
 ---
 
-## The idea
+## What is this?
 
-Optimizing molecules against a *single* learned oracle invites **reward hacking**: the search finds
-molecules that exploit the oracle's blind spots rather than molecules that are genuinely good. A
-single deep-learning co-folder (e.g. Boltz-2) used as an evolutionary fitness has exactly this
-failure mode.
+`oraclematch` is a Python library for evolutionary molecular optimization that uses **two methodologically different scoring oracles** (a deep-learning co-folder and a classical physics docker) and penalizes candidates where those oracles disagree. A molecule that one oracle loves but the other rejects is likely exploiting blind spots — the disagreement penalty pushes it down structurally, not through hand-tuned filters.
 
-oraclematch scores each candidate with **two methodologically orthogonal oracles** — a deep-learning
-co-folder and a classical-physics docker — and treats their **disagreement** as an explicit penalty
-inside quality-diversity (MAP-Elites) search:
+The search backbone is **MAP-Elites** (quality-diversity evolutionary search), so the output is an archive of diverse high-fitness candidates rather than a single best molecule.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Molecule population] --> B[Oracle A\nBoltz2Predictor\nDL co-folding GPU]
+    A --> C[Oracle B\nVinaPredictor\nclassical docking CPU]
+    B --> D[Per-oracle rank normalization]
+    C --> D
+    D --> E[EnsembleCalibrator\ncompute mean affinity\nand disagreement sigma]
+    E --> F[Calibrated fitness F\nmean affinity minus penalty]
+    F --> G[MAP-Elites archive\nbehavior descriptor bins]
+    G --> H[Mutation\nmutate genome]
+    H --> A
+    G --> I[Best molecule output]
+```
+
+---
+
+## The fitness formula
 
 ```
 F(x) = ā(x)  −  z · σ_a(x) / √K  −  μ · max(0, δ − c̄(x))
@@ -31,10 +48,9 @@ F(x) = ā(x)  −  z · σ_a(x) / √K  −  μ · max(0, δ − c̄(x))
 * `c̄(x)` — mean physical/structural confidence (e.g. a PoseBusters pass fraction), `δ` a floor
 * `z, μ` — penalty weights (config; intended to be calibrated by the KC-2 pilot)
 
-A molecule that one oracle loves and the other rejects (a single-oracle exploiter) has a large
-`σ_a` and is pushed down — structurally, not by hand-tuned filters. Because the two oracles use
-different units (log-pIC50-like vs. kcal/mol), `σ_a` is **only** computed after each oracle's scores
-are rank-normalized within the population; doing otherwise measures unit mismatch, not disagreement.
+`σ_a` is computed **only after rank-normalization** — raw scores use different units (log-pIC50-like vs. kcal/mol), so computing disagreement on raw scores would measure unit mismatch, not actual disagreement.
+
+---
 
 ## Novelty claim (the only one we make)
 
@@ -51,22 +67,17 @@ are rank-normalized within the population; doing otherwise measures unit mismatc
 | **AlphaDesign** (Mol. Syst. Biol. 2025) | AlphaFold confidence as fitness, standard EA | no docking oracle, no disagreement penalty, no MAP-Elites |
 | **REvolve** (arXiv 2406.01309) | LLM-evolved reward functions for RL locomotion | unrelated domain; no molecular oracles |
 
-**Honest caveat (from prior-art review):** the claim leans on the MAP-Elites quality-diversity
-component being meaningfully better than a plain multi-start GA + the same disagreement penalty. We
-ship an **ablation** (`oraclematch demo --ablation`) that compares QD vs. GA on the synthetic
-landscape; treat its result as a demonstration on synthetic data, not a general claim.
+**Honest caveat:** the claim leans on the MAP-Elites quality-diversity component being meaningfully better than a plain multi-start GA + the same disagreement penalty. The `--ablation` flag compares QD vs. GA on the synthetic landscape; treat its result as a demonstration on synthetic data, not a general claim.
+
+---
 
 ## Status & honest limitations
 
-* **No GPU validation yet.** The release was built in a CPU-only environment. The KC-2 pilot —
-  measuring the Spearman correlation between Boltz-2 and Vina on real complexes (the disagreement
-  penalty is only meaningful if `ρ` is not near 1) — is **deferred to v0.1.1** and is a documented
-  prerequisite for any empirical novelty claim. See `scripts/gpu_pilot_kc2.py`.
-* **Synthetic only.** Every number this package can produce today comes from the deterministic
-  `MockPredictor` on a synthetic landscape with *known ground truth*. It demonstrates that the
-  *mechanism* behaves as designed; it is **not** evidence about real binding affinity.
-* **Real backends are provided, not exercised.** `Boltz2Predictor` (GPU) and `VinaPredictor` (CPU)
-  are import-guarded; CI never runs them.
+* **No GPU validation yet.** The KC-2 pilot — measuring the Spearman correlation between Boltz-2 and Vina on real complexes — is **deferred to v0.1.1**. It is a prerequisite for any empirical novelty claim. See `scripts/gpu_pilot_kc2.py`.
+* **Synthetic only.** All numbers this package can produce today come from the deterministic `MockPredictor` on a synthetic landscape with known ground truth. It demonstrates the *mechanism* behaves as designed; it is **not** evidence about real binding affinity.
+* **Real backends provided, not exercised in CI.** `Boltz2Predictor` (GPU) and `VinaPredictor` (CPU) are import-guarded; CI never runs them.
+
+---
 
 ## Install
 
@@ -80,11 +91,14 @@ pip install "oraclematch[boltz] @ git+https://github.com/hinanohart/oraclematch@
 
 The core install is numpy-only and runs the synthetic demo and the full test suite with no GPU.
 
+---
+
 ## Quickstart (GPU-free, deterministic)
 
 ```bash
 oraclematch demo            # runs MAP-Elites with the disagreement penalty on the mock landscape
 oraclematch demo --controls # Control A (search efficiency) + Control B (anti-gaming)
+oraclematch demo --ablation # QD vs. plain GA comparison on the synthetic landscape
 ```
 
 ```python
@@ -99,11 +113,21 @@ archive = me.run(generations=20, population=32)
 print(me.best().fitness)
 ```
 
+---
+
+## How it works
+
+1. **Backends** — each oracle implements the `Predictor` protocol: `predict(mol)` returns a `PredictionResult` with `affinity` (higher-is-better, sign-normalized) and `confidence` in `[0, 1]`.
+2. **Rank normalization** — `oraclematch.core.normalize` maps each oracle's raw affinities to ranks within the current population, making `σ_a` a unit-free disagreement signal.
+3. **EnsembleCalibrator** — computes `F(x)` from rank-normalized affinities + confidence values for a batch of molecules.
+4. **MapElites** — multi-island MAP-Elites with periodic migration. A 2-D behavior descriptor bins molecules by genome statistics into an `8×8` archive per island. Setting `qd=False` collapses this to a plain (μ+λ) GA for the ablation.
+5. **Anti-gaming audit** — `oraclematch.audit.antigaming` provides the caught-rate / FPR methodology for injected single-oracle exploiters (mirrored from the `scorewright` project, reimplemented natively).
+
+---
+
 ## Synthetic results (deterministic, `backend="mock"`)
 
-Reproduce with `oraclematch demo --controls --ablation` (all seeds fixed; numbers below are the exact
-output). **These are on the synthetic landscape with known ground truth — a test of the mechanism,
-not evidence about real binding affinity.**
+Reproduce with `oraclematch demo --controls --ablation` (all seeds fixed). **These are on the synthetic landscape with known ground truth — a test of the mechanism, not evidence about real binding affinity.**
 
 **Control A — search efficiency** (mean top-5 ground-truth affinity, 12 seeds, paired bootstrap):
 
@@ -114,9 +138,7 @@ not evidence about real binding affinity.**
 | ensemble_mean (2 oracles, no penalty) | 2.27 | **no measurable difference** (paired CI spans 0) |
 | oracle_matched (2 oracles + penalty) | 2.33 | — |
 
-Honest reading: the disagreement penalty clearly beats naive single-oracle search, but its
-search-efficiency edge over *plain two-oracle averaging* is **not** statistically distinguishable on
-this landscape. The penalty's distinctive value shows up in robustness (Control B), not raw efficiency.
+Honest reading: the disagreement penalty clearly beats naive single-oracle search, but its search-efficiency edge over plain two-oracle averaging is **not** statistically distinguishable on this landscape. The penalty's distinctive value shows up in robustness (Control B), not raw efficiency.
 
 **Control B — anti-gaming** (catch injected single-oracle exploiters; Wilson CIs):
 
@@ -125,10 +147,9 @@ this landscape. The penalty's distinctive value shows up in robustness (Control 
 | moderate (`shared=0.5`, ρ≈0.60) | **0.975** [0.87, 0.996] | 0.150 [0.07, 0.29] |
 | high (`shared=0.9`, ρ≈0.91) | 0.400 [0.26, 0.55] | 0.050 [0.01, 0.17] |
 
-ρ is the intrinsic inter-oracle Spearman correlation over a neutral random ligand population — the
-KC-2 analog the real GPU pilot would measure. As the two oracles become more correlated, the
-disagreement signal weakens and the caught-rate collapses — an empirical demonstration of **why KC-2
-(the real-oracle correlation pilot) gates the whole method**.
+As the two oracles become more correlated, the disagreement signal weakens and caught-rate collapses — an empirical demonstration of why the KC-2 real-oracle correlation pilot gates the whole method.
+
+---
 
 ## Backends
 
@@ -138,16 +159,15 @@ disagreement signal weakens and the caught-rate collapses — an empirical demon
 | `VinaPredictor` | classical docking | CPU | MIT (AutoDock-Vina) | ❌ optional extra |
 | `Boltz2Predictor` | DL co-folding | GPU (~20 s/ligand) | MIT (Boltz-2) | ❌ optional extra |
 
-## License & attribution
-
-MIT. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Third-party components referenced as
-optional backends/operators keep their own licenses: Boltz-2 (MIT), AutoDock-Vina (MIT),
-RDKit (BSD-3-Clause), PoseBusters (BSD-3-Clause), openevolve (MIT). The anti-gaming caught-rate/FPR
-methodology is inspired by the author's `scorewright` project (MIT); it is reimplemented here
-natively to avoid cross-repo coupling.
+---
 
 ## Roadmap
 
 * **v0.1.1** — run the KC-2 oracle-correlation pilot on GPU; wire live Boltz-2 + Vina inference.
-* **v0.2** — VeriEvolve-Bio: reuse `scorewright`'s evolution/anti-gaming layer; Chai-1/Protenix as
-  additional oracles (K≥3); peptide targets.
+* **v0.2** — VeriEvolve-Bio: reuse `scorewright`'s evolution/anti-gaming layer; Chai-1/Protenix as additional oracles (K≥3); peptide targets.
+
+---
+
+## License & attribution
+
+MIT. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Third-party components referenced as optional backends/operators keep their own licenses: Boltz-2 (MIT), AutoDock-Vina (MIT), RDKit (BSD-3-Clause), PoseBusters (BSD-3-Clause), openevolve (MIT). The anti-gaming caught-rate/FPR methodology is inspired by the author's `scorewright` project (MIT); it is reimplemented here natively to avoid cross-repo coupling.
