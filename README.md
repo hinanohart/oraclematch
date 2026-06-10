@@ -156,7 +156,7 @@ As the two oracles become more correlated, the disagreement signal weakens and c
 | Backend | Paradigm | Compute | License | In CI |
 |---|---|---|---|---|
 | `MockPredictor` | synthetic linear | CPU, instant | MIT | ✅ always |
-| `VinaPredictor` | classical docking | CPU | MIT (AutoDock-Vina) | ❌ optional extra |
+| `VinaPredictor` | classical docking | CPU | Apache-2.0 (AutoDock-Vina) | ❌ optional extra |
 | `Boltz2Predictor` | DL co-folding | GPU (~20 s/ligand) | MIT (Boltz-2) | ❌ optional extra |
 
 ---
@@ -170,4 +170,4 @@ As the two oracles become more correlated, the disagreement signal weakens and c
 
 ## License & attribution
 
-MIT. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Third-party components referenced as optional backends/operators keep their own licenses: Boltz-2 (MIT), AutoDock-Vina (MIT), RDKit (BSD-3-Clause), PoseBusters (BSD-3-Clause), openevolve (MIT). The anti-gaming caught-rate/FPR methodology is inspired by the author's `scorewright` project (MIT); it is reimplemented here natively to avoid cross-repo coupling.
+MIT. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Third-party components referenced as optional backends/operators keep their own licenses: Boltz-2 (MIT), AutoDock-Vina (Apache-2.0), RDKit (BSD-3-Clause), PoseBusters (BSD-3-Clause), openevolve (MIT). The anti-gaming caught-rate/FPR methodology is inspired by the author's `scorewright` project (MIT); it is reimplemented here natively to avoid cross-repo coupling.
