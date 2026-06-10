@@ -19,19 +19,9 @@ The search backbone is **MAP-Elites** (quality-diversity evolutionary search), s
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    A[Molecule population] --> B[Oracle A<br>Boltz2Predictor<br>DL co-folding GPU]
-    A --> C[Oracle B<br>VinaPredictor<br>classical docking CPU]
-    B --> D[Per-oracle rank normalization]
-    C --> D
-    D --> E[EnsembleCalibrator<br>compute mean affinity<br>and disagreement sigma]
-    E --> F[Calibrated fitness F<br>mean affinity minus penalty]
-    F --> G[MAP-Elites archive<br>behavior descriptor bins]
-    G --> H[Mutation<br>mutate genome]
-    H --> A
-    G --> I[Best molecule output]
-```
+<div align="center">
+  <img src="docs/architecture.png" alt="oraclematch architecture" width="840">
+</div>
 
 ---
 
@@ -171,3 +161,4 @@ As the two oracles become more correlated, the disagreement signal weakens and c
 ## License & attribution
 
 MIT. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Third-party components referenced as optional backends/operators keep their own licenses: Boltz-2 (MIT), AutoDock-Vina (Apache-2.0), RDKit (BSD-3-Clause), PoseBusters (BSD-3-Clause), openevolve (MIT). The anti-gaming caught-rate/FPR methodology is inspired by the author's `scorewright` project (MIT); it is reimplemented here natively to avoid cross-repo coupling.
+

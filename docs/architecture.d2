@@ -1,0 +1,47 @@
+direction: down
+explanation: |md
+  ### oraclematch
+  **Cross-paradigm oracle disagreement as a calibrated fitness penalty for MAP-Elites molecular search.**
+| {near: top-center}
+
+molecules: "① Molecule population" {shape: oval; style: {fill: "#6366f1"; font-color: "#ffffff"; stroke: "#4338ca"; bold: true; font-size: 18}}
+
+oracles: "② Dual Oracles" {
+  style: {fill: "#fffbeb"; stroke: "#f59e0b"; font-color: "#92400e"; bold: true; font-size: 16}
+  oracle_a: "Oracle A\nBoltz2Predictor\nDL co-folding GPU"
+  oracle_b: "Oracle B\nVinaPredictor\nclassical docking CPU"
+  oracle_a.style: {fill: "#fef3c7"; font-color: "#92400e"}
+  oracle_b.style: {fill: "#fef3c7"; font-color: "#92400e"}
+}
+
+rank: "③ Per-oracle rank normalization" {style: {fill: "#dcfce7"; font-color: "#065f46"; stroke: "#10b981"; bold: true; font-size: 16}}
+calibrator: "④ EnsembleCalibrator\nmean affinity + disagreement sigma" {style: {fill: "#0ea5e9"; font-color: "#ffffff"; stroke: "#0369a1"; bold: true; font-size: 16}}
+fitness: "⑤ Calibrated fitness F\nmean affinity minus penalty" {style: {fill: "#dcfce7"; font-color: "#065f46"; stroke: "#10b981"; bold: true; font-size: 16}}
+
+archive_zone: "MAP-Elites Archive" {
+  style: {fill: "#f0fdf4"; stroke: "#10b981"; font-color: "#065f46"; bold: true; font-size: 16}
+  archive: "⑥ MAP-Elites archive\nbehavior descriptor bins"
+  mutation: "⑦ Mutation\nmutate genome"
+  archive.style: {fill: "#dcfce7"; font-color: "#065f46"}
+  mutation.style: {fill: "#dcfce7"; font-color: "#065f46"}
+}
+
+best: "⑧ Best molecule output" {shape: cylinder; style: {fill: "#fdf2f8"; font-color: "#9d174e"; stroke: "#ec4899"; bold: true; font-size: 16}}
+
+molecules -> oracles.oracle_a: "② score DL"
+molecules -> oracles.oracle_b: "② score physics"
+oracles.oracle_a -> rank: "③ normalize"
+oracles.oracle_b -> rank: "③ normalize"
+rank -> calibrator: "④ calibrate"
+calibrator -> fitness: "⑤ penalize"
+fitness -> archive_zone.archive: "⑥ bin"
+archive_zone.archive -> archive_zone.mutation: "⑦ mutate"
+archive_zone.mutation -> molecules: "① evolve"
+archive_zone.archive -> best: "⑧ extract"
+
+legend: "Legend" {
+  near: bottom-center
+  style: {fill: "#f8fafc"; stroke: "#cbd5e1"; font-size: 13}
+  e: "● entry/population"; c: "● core calibrator"; p: "● processing"; b: "● oracles"; d: "● output"
+  e.style.font-color: "#4338ca"; c.style.font-color: "#0369a1"; p.style.font-color: "#10b981"; b.style.font-color: "#f59e0b"; d.style.font-color: "#ec4899"
+}
