@@ -21,14 +21,14 @@ The search backbone is **MAP-Elites** (quality-diversity evolutionary search), s
 
 ```mermaid
 flowchart TD
-    A[Molecule population] --> B[Oracle A\nBoltz2Predictor\nDL co-folding GPU]
-    A --> C[Oracle B\nVinaPredictor\nclassical docking CPU]
+    A[Molecule population] --> B[Oracle A<br>Boltz2Predictor<br>DL co-folding GPU]
+    A --> C[Oracle B<br>VinaPredictor<br>classical docking CPU]
     B --> D[Per-oracle rank normalization]
     C --> D
-    D --> E[EnsembleCalibrator\ncompute mean affinity\nand disagreement sigma]
-    E --> F[Calibrated fitness F\nmean affinity minus penalty]
-    F --> G[MAP-Elites archive\nbehavior descriptor bins]
-    G --> H[Mutation\nmutate genome]
+    D --> E[EnsembleCalibrator<br>compute mean affinity<br>and disagreement sigma]
+    E --> F[Calibrated fitness F<br>mean affinity minus penalty]
+    F --> G[MAP-Elites archive<br>behavior descriptor bins]
+    G --> H[Mutation<br>mutate genome]
     H --> A
     G --> I[Best molecule output]
 ```
